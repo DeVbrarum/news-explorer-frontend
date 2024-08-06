@@ -1,0 +1,60 @@
+@import url(./vendor/normalize.css);
+
+
+@font-face {
+  font-family: 'Roboto Slab';
+  src: url('./vendor/fonts/roboto-slab-400-regular.woff') format('woff'),
+       url('./vendor/fonts/roboto-slab-400-regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Roboto';
+  src: url('./vendor/fonts/roboto-400-regular.woff') format('woff'),
+       url('./vendor/fonts/inter-400-regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Roboto';
+  src: url('./vendor/fonts/roboto-500.woff') format('woff'),
+       url('./vendor/fonts/roboto-500.woff2') format('woff2');
+  font-weight: 500;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Roboto';
+  src: url('./vendor/fonts/roboto-900.woff') format('woff'),
+       url('./vendor/fonts/roboto-900.woff2') format('woff2');
+  font-weight: 900;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Inter';
+  src: url('./vendor/fonts/inter-400-regular.woff') format('woff'),
+       url('./vendor/fonts/inter-400-regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+}
+
+
+body {
+  min-width: 320px;
+  max-width: 1440px;
+  font-family: 'Roboto', 'Roboto Slab', 'Inter', Arial, sans-serif;
+  margin: auto;
+  padding: 0;
+  box-sizing: border-box;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: #F5F6F7;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}

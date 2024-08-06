@@ -1,0 +1,20 @@
+.saved-news {
+  display: flex;
+  flex-direction: column;
+  background-color: #F5F6F7;
+  padding: 0;
+  }
+  
+  .saved-news__cards {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  @media screen and (max-width: 540px) {
+    .saved-news__cards {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+  }
