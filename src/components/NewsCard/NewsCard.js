@@ -5,14 +5,16 @@ import { ReactComponent as BookmarkedIcon } from '../../images/bookmarked.svg';
 import { ReactComponent as TrashIcon } from '../../images/trash.svg';
 import { CurrentUserContext } from '../../contexts/CurrentUserContext';
 
-
-function NewsCard({ article, onSaveArticle, onRemoveArticle, isSaved, showKeyword, isSavedPage }) {
+function NewsCard({ article, onSaveArticle, onRemoveArticle, savedArticles, isSaved, showKeyword, isSavedPage }) {
   const [isHovered, setIsHovered] = useState(false);
   const { currentUser } = useContext(CurrentUserContext);
 
   const handleSaveClick = () => {
-    if (isSaved|| isSavedPage) {
-      onRemoveArticle(article);
+    if (isSaved || isSavedPage) {
+      const savedArticle = savedArticles.find(a => a.title === article.title);
+      if (savedArticle) {
+        onRemoveArticle(savedArticle._id);
+      }
     } else {
       onSaveArticle(article);
     }
@@ -29,14 +31,18 @@ function NewsCard({ article, onSaveArticle, onRemoveArticle, isSaved, showKeywor
   return (
     <div className="news-card">
       {showKeyword && <div className="news-card__keyword">{article.keyword}</div>}
-      <img src={article.urlToImage} alt={article.title} className="news-card__image" />
-      <p className='news-card__date'>{formatDate(article.publishedAt)}</p>
+      <img src={article.image || article.urlToImage} alt={article.title} className="news-card__image" />
+      <p className="news-card__date">{formatDate(article.date || article.publishedAt)}</p>
       <div className="news-card__content">
         <h2 className="news-card__title">{article.title}</h2>
-        <p className="news-card__description">{article.description}</p>
-        <p className="news-card__source">{article.source.name}</p>
+        <p className="news-card__description">{article.text || article.description}</p>
+        <p className="news-card__source">
+          {typeof article.source === 'string' 
+            ? article.source 
+            : article.source?.name}
+        </p>
       </div>
-      <div 
+      <div
         className="news-card__button-container"
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}

@@ -62,11 +62,11 @@ function PopupWithForm({ isOpen, onClose, title, onSubmit, type, errorMessage, s
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if ((type === 'signUp' || type === 'signIn') && !validateEmail(email))  {
+    if ((type === 'signUp' || type === 'signIn') && !validateEmail(email)) {
       setEmailError('Dirección de correo electrónico no válida');
       return;
     }
-    onSubmit(type, email);
+    onSubmit(type, email, password, name);
   };
 
   const renderContent = () => {

@@ -2,7 +2,8 @@
   display: flex;
   flex-direction: column;
   padding-left: 104px;
-  background-color: white;
+  background-color: #ffffff;
+  width: 100vw;
 }
 
 .saved-news-header__pretitle {

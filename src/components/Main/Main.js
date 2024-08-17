@@ -4,6 +4,7 @@ import Header from '../Header/Header';
 import SearchForm from '../SearchForm/SearchForm';
 import SearchResults from '../SearchResults/SearchResults';
 import AboutSection from '../About/About';
+import Footer from '../Footer/Footer';
 import { useLocation } from 'react-router-dom';
 
 function Main({
@@ -47,6 +48,7 @@ function Main({
         </div>
       </div>
       <AboutSection />
+      {location.pathname === '/' && <Footer />}
     </>
   );
 }

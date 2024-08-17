@@ -3,12 +3,14 @@ import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import Main from '../Main/Main';
 import SavedNews from '../SavedNews/SavedNews';
 import Header from '../Header/Header';
-import Footer from '../Footer/Footer';
 import PopupWithForm from '../PopupWithForm/PopupWithForm';
 import Preloader from '../Preloader/Preloader';
+import ProtectedRoute from '../ProtectedRoute/ProtectedRoute';
+import NotFound from '../NotFound/NotFound';
+import { saveArticle, deleteArticle, register, authorize, getUserInfo } from '../../utils/MainApi';
 import { CurrentUserProvider, CurrentUserContext } from '../../contexts/CurrentUserContext';
 import { fetchNews } from '../../utils/api';
-import { saveAuthToken, removeAuthToken } from '../../utils/auth';
+import { saveAuthToken, removeAuthToken, getAuthToken } from '../../utils/auth';
 import './App.css';
 import useWindowSize from '../../hooks/useWindowSize';
 
@@ -24,22 +26,26 @@ function App() {
   const [savedArticles, setSavedArticles] = useState([]);
   const [searchError, setSearchError] = useState('');
   const [currentKeyword, setCurrentKeyword] = useState('');
+  const [currentUser, setCurrentUser] = useState(null);
   const [menuIconVisible, setMenuIconVisible] = useState(true);
   const width = useWindowSize();
 
-  //Simulacion de carga inicial
   useEffect(() => {
-    setTimeout(() => {
+    const token = getAuthToken();
+    if (token) {
+      getUserInfo(token)
+        .then((user) => {
+          setCurrentUser(user);
+        })
+        .catch((err) => {
+          console.error('Error fetching user info:', err);
+          removeAuthToken();
+        })
+        .finally(() => setLoading(false));
+    } else {
       setLoading(false);
-    }, 2000);
+    }
   }, []);
-
-  // Carga de artículos guardados desde el almacenamiento local
-  useEffect(() => {
-    const savedArticles = JSON.parse(localStorage.getItem('savedArticles')) || [];
-    setSavedArticles(savedArticles);
-  }, []);
-
 
   const handlePopupOpen = (type) => {
     setPopupType(type);
@@ -57,28 +63,38 @@ function App() {
     }
   };
 
-  const handleSignInSubmit = (type, email, setCurrentUser) => {
+  const handleSignInSubmit = async (type, email, password, setCurrentUser) => {
     if (type === 'signIn') {
-      const token = 'mockToken';
-      saveAuthToken(token);
-      setCurrentUser({ name: 'Elise', email });
-      handlePopupClose();
+      try {
+        const data = await authorize(email, password);
+        saveAuthToken(data.token);
+
+        const userInfo = await getUserInfo(data.token);
+        setCurrentUser(userInfo);
+
+        handlePopupClose();
+      } catch (err) {
+        console.error('Error during sign in:', err);
+        setSignUpError('Error de inicio de sesión: ' + err.message);
+      }
     } else if (type === 'switchToSignUp') {
       setPopupType('signUp');
     }
   };
 
-  const handleSignUpSubmit = (type, email, setCurrentUser) => {
-    if (type === 'signUp') {
-      const isEmailTaken = email === 'pruebas@email.com';
-      if (isEmailTaken) {
-        setSignUpError('Este correo electrónico no está disponible');
+  const handleSignUpSubmit = async (type, email, password, name, setCurrentUser) => {
+    try {
+      await register(email, password, name);
+      setCurrentUser({ name, email });
+      handlePopupClose();
+      setShowSuccessMessage(true);
+    } catch (error) {
+      const errorMessage = error?.message || 'Error desconocido';
+
+      if (errorMessage.includes("Ese correo ya está registrado")) {
+        setSignUpError("Ese correo ya está registrado, intente con otro");
       } else {
-        const token = 'mockToken';
-        saveAuthToken(token);
-        setCurrentUser({ name: 'Elise', email });
-        handlePopupClose();
-        setShowSuccessMessage(true);
+        setSignUpError(`Error de registro: ${errorMessage}`);
       }
     }
   };
@@ -97,7 +113,6 @@ function App() {
     setShowSuccessMessage(false);
     handlePopupOpen('signIn');
   };
-
 
   const handleSearch = async (query) => {
     if (!query) {
@@ -122,17 +137,38 @@ function App() {
     }
   };
 
-  const handleSaveArticle = (article) => {
-    const updatedArticle = { ...article, keyword: currentKeyword };
-    const updatedArticles = [...savedArticles, updatedArticle];
-    setSavedArticles(updatedArticles);
-    localStorage.setItem('savedArticles', JSON.stringify(updatedArticles));
+  const handleSaveArticle = async (article) => {
+    if (!currentUser) return;
+
+    try {
+      const token = getAuthToken();
+      const savedArticle = await saveArticle({
+        keyword: currentKeyword,
+        title: article.title,
+        text: article.description,
+        date: article.publishedAt,
+        source: article.source.name,
+        link: article.url,
+        image: article.urlToImage
+      }, token);
+      setSavedArticles([...savedArticles, savedArticle]);
+    } catch (error) {
+      console.error('Failed to save article:', error);
+    }
   };
 
-  const handleRemoveArticle = (article) => {
-    const updatedArticles = savedArticles.filter(a => a.title !== article.title);
-    setSavedArticles(updatedArticles);
-    localStorage.setItem('savedArticles', JSON.stringify(updatedArticles));
+  const handleRemoveArticle = async (articleId) => {
+    if (!currentUser) return;
+
+    try {
+      const token = getAuthToken();
+      await deleteArticle(articleId, token);
+      setSavedArticles((prevSavedArticles) =>
+        prevSavedArticles.filter(article => article._id !== articleId)
+      );
+    } catch (error) {
+      console.error('Failed to remove article:', error);
+    }
   };
 
   const resetSearchResults = () => {
@@ -170,8 +206,9 @@ function App() {
                       menuIconVisible={menuIconVisible}
                       resetSearchResults={resetSearchResults}
                     />} />
+
                   <Route path="/saved-news" element={
-                    <>
+                    <ProtectedRoute>
                       <Header
                         isLoggedIn={!!currentUser}
                         onSignInClick={() => handlePopupOpen('signIn')}
@@ -183,16 +220,17 @@ function App() {
                       />
                       <SavedNews
                         savedArticles={savedArticles}
-                        onRemoveArticle={handleRemoveArticle}
+                        handleRemoveArticle={handleRemoveArticle}
                         resetSearchResults={resetSearchResults}
                       />
-                    </>
+                    </ProtectedRoute>
                   } />
+                  {/* Ruta catch-all para manejar 404 */}
+                  <Route path="*" element={<NotFound />} />
                 </Routes>
               </>
             )}
           </CurrentUserContext.Consumer>
-          <Footer />
           <CurrentUserContext.Consumer>
             {({ currentUser, setCurrentUser }) => (
               <>
@@ -201,14 +239,14 @@ function App() {
                   onClose={handlePopupClose}
                   title={popupType === 'signIn' ? 'Iniciar Sesión' : 'Inscribirse'}
                   onSubmit={
-                    popupType === 'signIn' ? (type, email) =>
-                      handleSignInSubmit(type, email, setCurrentUser) : (type, email) =>
-                      handleSignUpSubmit(type, email, setCurrentUser)
+                    popupType === 'signIn'
+                      ? (type, email, password) => handleSignInSubmit(type, email, password, setCurrentUser)
+                      : (type, email, password, name) => handleSignUpSubmit(type, email, password, name, setCurrentUser)
                   }
                   type={popupType}
                   errorMessage={popupType === 'signUp' ? signUpError : ''}
                   switchToSignIn={switchToSignIn}
-                  switchToSignUp={() => setPopupType('signUp')}
+                  switchToSignUp={() => setPopupType('SignUp')}
                 />
                 <PopupWithForm
                   isOpen={showSuccessMessage}
