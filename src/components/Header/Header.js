@@ -66,8 +66,8 @@ function Header({ onSignInClick, isPopupOpen, menuIconVisible, resetSearchResult
         </nav>
         {menuIconVisible && (
           <div className={`header__menu-icon ${location.pathname === '/saved-news' ? 'header__menu-icon--saved-news_actived' : ''}`} onClick={toggleMenu}>
-            <MenuIcon className={`header__menu-svg ${menuOpen ? 'open' : ''}`} />
-          </div>
+          <MenuIcon className={`header__menu-svg ${menuOpen ? 'open' : ''}`} />
+        </div>
         )}
       </div>
       {menuOpen && (

@@ -1,41 +1,59 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState, useContext, useCallback } from 'react';
+import { useLocation } from 'react-router-dom';
 import NewsCardList from '../NewsCardList/NewsCardList';
 import SavedNewsHeader from '../SavedNewsHeader/SavedNewsHeader';
-import Preloader from '../Preloader/Preloader';
+import Header from '../Header/Header';
+import { getSavedArticles } from '../../utils/MainApi';
+import { CurrentUserContext } from '../../contexts/CurrentUserContext';
+import Footer from '../Footer/Footer';
 import './SavedNews.css';
 
-function SavedNews({ savedArticles, onRemoveArticle, resetSearchResults }) {
-  const [loading, setLoading] = useState(true);
+function SavedNews({ resetSearchResults, handleRemoveArticle }) {
+  const { currentUser } = useContext(CurrentUserContext);
+  const [savedArticles, setSavedArticles] = useState([]);
+  const location = useLocation();
+
+  const fetchSavedArticles = useCallback(() => {
+    if (currentUser) {
+      const token = localStorage.getItem('auth_token');
+      getSavedArticles(token)
+        .then((articles) => {
+          setSavedArticles(articles);
+        })
+        .catch((err) => {
+          console.error('Error fetching saved articles:', err);
+        });
+    }
+  }, [currentUser]);
 
   useEffect(() => {
+    fetchSavedArticles();
+  }, [fetchSavedArticles]);
+
+  const handleRemoveArticleAndUpdate = (articleId) => {
+    handleRemoveArticle(articleId).then(() => fetchSavedArticles());
+  };
+
+  useEffect(() => {
+    // Resetear los resultados de búsqueda cuando se cargue SavedNews
     resetSearchResults();
   }, [resetSearchResults]);
 
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setLoading(false);
-    }, 1000);
-
-    return () => clearTimeout(timer);
-  }, []);
-
-  if (loading) {
-    return <Preloader text="Cargando..." />;
-  }
-
   return (
-    <div className="saved-news">
-      <SavedNewsHeader savedArticles={savedArticles} />
-      <div className="saved-news__cards">
-      <NewsCardList 
-      articles={savedArticles} 
-      onRemoveArticle={onRemoveArticle} 
-      savedArticles={savedArticles}
-      showKeyword={true}
-      isSavedPage={true}
-      />
+    <>
+      <Header />
+      <div className="saved-news">
+        <SavedNewsHeader savedArticles={savedArticles} />
+        <NewsCardList
+          articles={savedArticles}
+          savedArticles={savedArticles}
+          onRemoveArticle={handleRemoveArticleAndUpdate}
+          showKeyword={true}
+          isSavedPage={true}
+        />
       </div>
-    </div>
+      {location.pathname !== '/404' && <Footer />}
+    </>
   );
 }
 

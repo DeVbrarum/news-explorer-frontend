@@ -42,6 +42,17 @@ function PopupWithForm({ isOpen, onClose, title, onSubmit, type, errorMessage, s
     if (emailError) {
       setEmailError('');
     }
+    setIsFormValid(validateForm());
+  };
+  
+  const handlePasswordChange = (e) => {
+    setPassword(e.target.value);
+    setIsFormValid(validateForm());
+  };
+  
+  const handleNameChange = (e) => {
+    setName(e.target.value);
+    setIsFormValid(validateForm());
   };
 
   const handleEmailBlur = () => {
@@ -52,21 +63,13 @@ function PopupWithForm({ isOpen, onClose, title, onSubmit, type, errorMessage, s
     }
   };
 
-  const handlePasswordChange = (e) => {
-    setPassword(e.target.value);
-  };
-
-  const handleNameChange = (e) => {
-    setName(e.target.value);
-  };
-
   const handleSubmit = (e) => {
     e.preventDefault();
-    if ((type === 'signUp' || type === 'signIn') && !validateEmail(email))  {
+    if ((type === 'signUp' || type === 'signIn') && !validateEmail(email)) {
       setEmailError('Dirección de correo electrónico no válida');
       return;
     }
-    onSubmit(type, email);
+    onSubmit(type, email, password, name);
   };
 
   const renderContent = () => {

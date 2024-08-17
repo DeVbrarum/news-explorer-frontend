@@ -11,6 +11,7 @@ function NewsCardList({ articles, onSaveArticle, onRemoveArticle, savedArticles,
           article={article} 
           onSaveArticle={onSaveArticle} 
           onRemoveArticle={onRemoveArticle}
+          savedArticles={savedArticles}
           isSaved={savedArticles.some(savedArticle => savedArticle.title === article.title)}
           showKeyword={showKeyword}
           isSavedPage={isSavedPage}

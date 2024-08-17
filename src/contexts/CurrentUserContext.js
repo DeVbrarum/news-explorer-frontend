@@ -1,5 +1,6 @@
 import React, { createContext, useState, useEffect } from 'react';
 import { getAuthToken, removeAuthToken } from '../utils/auth';
+import { getUserInfo } from '../utils/MainApi';
 
 export const CurrentUserContext = createContext();
 
@@ -9,9 +10,14 @@ export const CurrentUserProvider = ({ children }) => {
   useEffect(() => {
     const token = getAuthToken();
     if (token) {
-      // Simular la obtención de datos del usuario desde el token
-      const user = { name: 'Elise', email: 'elise@example.com' };
-      setCurrentUser(user);
+      getUserInfo(token)
+        .then((user) => {
+          setCurrentUser(user);
+        })
+        .catch((err) => {
+          console.error('Error fetching user info:', err);
+          removeAuthToken();
+        });
     }
   }, []);
 
@@ -21,7 +27,7 @@ export const CurrentUserProvider = ({ children }) => {
   };
 
   return (
-    <CurrentUserContext.Provider value={{ currentUser, setCurrentUser, logout  }}>
+    <CurrentUserContext.Provider value={{ currentUser, setCurrentUser, logout }}>
       {children}
     </CurrentUserContext.Provider>
   );
