@@ -6,6 +6,7 @@ import PopupWithForm from '../PopupWithForm/PopupWithForm';
 import Preloader from '../Preloader/Preloader';
 import ProtectedRoute from '../ProtectedRoute/ProtectedRoute';
 import NotFound from '../NotFound/NotFound';
+import Header from '../Header/Header';
 import { saveArticle, deleteArticle, register, authorize, getUserInfo } from '../../utils/MainApi';
 import { CurrentUserProvider, CurrentUserContext } from '../../contexts/CurrentUserContext';
 import { fetchNews } from '../../utils/api';
@@ -208,6 +209,15 @@ function App() {
                   />
                   <Route path="/saved-news" element={
                     <ProtectedRoute>
+                      <Header
+                        isLoggedIn={!!currentUser}
+                        onSignInClick={() => handlePopupOpen('signIn')}
+                        onLogout={() => handleLogout(setCurrentUser)}
+                        userName={currentUser?.name}
+                        isPopupOpen={isPopupOpen}
+                        menuIconVisible={menuIconVisible}
+                        resetSearchResults={resetSearchResults}
+                      />
                       <SavedNews
                         savedArticles={savedArticles}
                         handleRemoveArticle={handleRemoveArticle}
@@ -230,14 +240,14 @@ function App() {
                   onClose={handlePopupClose}
                   title={popupType === 'signIn' ? 'Iniciar Sesión' : 'Inscribirse'}
                   onSubmit={
-                    popupType === 'signIn'
+                    popupType === 'signIn' 
                       ? (type, email, password) => handleSignInSubmit(type, email, password, setCurrentUser)
                       : (type, email, password, name) => handleSignUpSubmit(type, email, password, name, setCurrentUser)
                   }
                   type={popupType}
                   errorMessage={popupType === 'signUp' ? signUpError : ''}
                   switchToSignIn={switchToSignIn}
-                  switchToSignUp={() => setPopupType('SignUp')}
+                  switchToSignUp={() => setPopupType('signUp')}
                 />
                 <PopupWithForm
                   isOpen={showSuccessMessage}

@@ -42,6 +42,17 @@ function PopupWithForm({ isOpen, onClose, title, onSubmit, type, errorMessage, s
     if (emailError) {
       setEmailError('');
     }
+    setIsFormValid(validateForm());
+  };
+  
+  const handlePasswordChange = (e) => {
+    setPassword(e.target.value);
+    setIsFormValid(validateForm());
+  };
+  
+  const handleNameChange = (e) => {
+    setName(e.target.value);
+    setIsFormValid(validateForm());
   };
 
   const handleEmailBlur = () => {
@@ -50,14 +61,6 @@ function PopupWithForm({ isOpen, onClose, title, onSubmit, type, errorMessage, s
     } else {
       setEmailError('');
     }
-  };
-
-  const handlePasswordChange = (e) => {
-    setPassword(e.target.value);
-  };
-
-  const handleNameChange = (e) => {
-    setName(e.target.value);
   };
 
   const handleSubmit = (e) => {
