@@ -1,13 +1,17 @@
 import React, { useEffect, useState, useContext, useCallback } from 'react';
+import { useLocation } from 'react-router-dom';
 import NewsCardList from '../NewsCardList/NewsCardList';
 import SavedNewsHeader from '../SavedNewsHeader/SavedNewsHeader';
+import Header from '../Header/Header';
 import { getSavedArticles } from '../../utils/MainApi';
 import { CurrentUserContext } from '../../contexts/CurrentUserContext';
+import Footer from '../Footer/Footer';
 import './SavedNews.css';
 
 function SavedNews({ resetSearchResults, handleRemoveArticle }) {
   const { currentUser } = useContext(CurrentUserContext);
   const [savedArticles, setSavedArticles] = useState([]);
+  const location = useLocation();
 
   const fetchSavedArticles = useCallback(() => {
     if (currentUser) {
@@ -36,16 +40,20 @@ function SavedNews({ resetSearchResults, handleRemoveArticle }) {
   }, [resetSearchResults]);
 
   return (
-    <div className="saved-news">
-      <SavedNewsHeader savedArticles={savedArticles} />
-      <NewsCardList
-        articles={savedArticles}
-        savedArticles={savedArticles}
-        onRemoveArticle={handleRemoveArticleAndUpdate}
-        showKeyword={true}
-        isSavedPage={true}
-      />
-    </div>
+    <>
+      <Header />
+      <div className="saved-news">
+        <SavedNewsHeader savedArticles={savedArticles} />
+        <NewsCardList
+          articles={savedArticles}
+          savedArticles={savedArticles}
+          onRemoveArticle={handleRemoveArticleAndUpdate}
+          showKeyword={true}
+          isSavedPage={true}
+        />
+      </div>
+      {location.pathname !== '/404' && <Footer />}
+    </>
   );
 }
 

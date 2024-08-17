@@ -76,7 +76,6 @@ export const saveArticle = (article, token) => {
   };
 
 export const deleteArticle = (articleId, token) => {
-  console.log(`Deleting article with ID: ${articleId}`);
   return fetch(`${BASE_URL}/articles/${articleId}`, {
     method: 'DELETE',
     headers: {

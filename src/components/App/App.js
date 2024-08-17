@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import Main from '../Main/Main';
 import SavedNews from '../SavedNews/SavedNews';
-import Header from '../Header/Header';
 import PopupWithForm from '../PopupWithForm/PopupWithForm';
 import Preloader from '../Preloader/Preloader';
 import ProtectedRoute from '../ProtectedRoute/ProtectedRoute';
@@ -29,6 +28,7 @@ function App() {
   const [currentUser, setCurrentUser] = useState(null);
   const [menuIconVisible, setMenuIconVisible] = useState(true);
   const width = useWindowSize();
+
 
   useEffect(() => {
     const token = getAuthToken();
@@ -187,8 +187,7 @@ function App() {
         <div className="App">
           <CurrentUserContext.Consumer>
             {({ currentUser, setCurrentUser }) => (
-              <>
-                <Routes>
+              <Routes>
                   <Route path="/" element={
                     <Main
                       articles={articles}
@@ -205,19 +204,10 @@ function App() {
                       isPopupOpen={isPopupOpen}
                       menuIconVisible={menuIconVisible}
                       resetSearchResults={resetSearchResults}
-                    />} />
-
+                    />}
+                  />
                   <Route path="/saved-news" element={
                     <ProtectedRoute>
-                      <Header
-                        isLoggedIn={!!currentUser}
-                        onSignInClick={() => handlePopupOpen('signIn')}
-                        onLogout={() => handleLogout(setCurrentUser)}
-                        userName={currentUser?.name}
-                        isPopupOpen={isPopupOpen}
-                        menuIconVisible={menuIconVisible}
-                        resetSearchResults={resetSearchResults}
-                      />
                       <SavedNews
                         savedArticles={savedArticles}
                         handleRemoveArticle={handleRemoveArticle}
@@ -225,10 +215,11 @@ function App() {
                       />
                     </ProtectedRoute>
                   } />
-                  {/* Ruta catch-all para manejar 404 */}
-                  <Route path="*" element={<NotFound />} />
-                </Routes>
-              </>
+                
+                {/* Ruta catch-all para manejar 404 */}
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+
             )}
           </CurrentUserContext.Consumer>
           <CurrentUserContext.Consumer>

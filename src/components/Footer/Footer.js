@@ -9,7 +9,7 @@ function Footer() {
       <div className="footer__content">
         <div className="footer__links">
           <a href="/" className="footer__link">Inicio</a>
-          <a href="https://practicum.yandex.com/" target="_blank" rel="noopener noreferrer" className="footer__link">Practicum</a>
+          <a href="https://tripleten.mx/" target="_blank" rel="noopener noreferrer" className="footer__link">Tripleten</a>
         </div>
         <div className="footer__icons">
           <a href="https://www.github.com" target="_blank" rel="noopener noreferrer" className="footer__icon">

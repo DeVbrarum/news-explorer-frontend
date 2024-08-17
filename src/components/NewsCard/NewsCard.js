@@ -28,17 +28,40 @@ function NewsCard({ article, onSaveArticle, onRemoveArticle, savedArticles, isSa
     return `${day} de ${month} de ${year}`;
   };
 
+  const handleOpenLink = () => {
+    if (article && article.url) {
+      const url = article.url.startsWith('http') ? article.url : `https://${article.url}`;
+      window.open(url, '_blank');
+    } else if(article && article.link){
+      const link = article.link.startsWith('http') ? article.link : `https://${article.link}`;
+      window.open(link, '_blank');
+      console.error('Article or link is undefined');
+    }
+  };
+
   return (
     <div className="news-card">
       {showKeyword && <div className="news-card__keyword">{article.keyword}</div>}
-      <img src={article.image || article.urlToImage} alt={article.title} className="news-card__image" />
+      <img
+        src={article.image || article.urlToImage}
+        alt={article.title}
+        className="news-card__image"
+        onClick={handleOpenLink}
+        style={{ cursor: 'pointer' }}
+      />
       <p className="news-card__date">{formatDate(article.date || article.publishedAt)}</p>
       <div className="news-card__content">
-        <h2 className="news-card__title">{article.title}</h2>
+        <h2
+          className="news-card__title"
+          onClick={handleOpenLink}
+          style={{ cursor: 'pointer' }}
+        >
+          {article.title}
+        </h2>
         <p className="news-card__description">{article.text || article.description}</p>
         <p className="news-card__source">
-          {typeof article.source === 'string' 
-            ? article.source 
+          {typeof article.source === 'string'
+            ? article.source
             : article.source?.name}
         </p>
       </div>

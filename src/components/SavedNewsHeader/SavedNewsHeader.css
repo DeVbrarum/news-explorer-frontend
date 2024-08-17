@@ -64,3 +64,10 @@
     margin: 0 0 32px 0;
   }
 }
+
+@media screen and (min-width:1440px) {
+  .saved-news-header {
+    width: 1336px;
+    max-width: 1440px;
+  } 
+}

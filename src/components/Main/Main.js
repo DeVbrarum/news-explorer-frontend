@@ -48,7 +48,7 @@ function Main({
         </div>
       </div>
       <AboutSection />
-      {location.pathname === '/' && <Footer />}
+      {location.pathname !== '/404' && <Footer />}
     </>
   );
 }
